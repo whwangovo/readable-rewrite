@@ -1,0 +1,6 @@
+{
+  "name": "readable-rewrite",
+  "version": "0.2.1",
+  "description": "Shows a Sonnet 5.5 or Haiku 5.5 rewrite of an assistant reply on request, easier to read; the model's context keeps the original. Pick per message, or /readable sonnet|haiku to rewrite every reply.",
+  "types": "./types/index.d.ts"
+}

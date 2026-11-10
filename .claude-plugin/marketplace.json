@@ -1,0 +1,6 @@
+{
+  "name": "readable-rewrite",
+  "owner": { "name": "whwangovo" },
+  "description": "readable-rewrite: easier-to-read rewrites of Claude Code replies, on request.",
+  "plugins": [{ "name": "readable-rewrite", "source": "./" }]
+}
