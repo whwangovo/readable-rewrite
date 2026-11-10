@@ -10,11 +10,13 @@ const usage = { input_tokens: 1, output_tokens: 1, cache_creation_input_tokens: 
 
 function engine(on: On, answer?: (model: string, calls: number) => unknown) {
   const asks: { model: string; prompt: string }[] = []
+  const efforts: unknown[] = []
   on('session.start', (_, e) => ({ cwd: e.cwd }))
   on('command.register', () => ({ value: { command: 'readable' } }))
   on('command.run', () => ({ text: '' }))
   on('model.complete', (_, e) => {
     asks.push({ model: e.model, prompt: String(e.prompt) })
+    efforts.push(e.effort)
     const custom = answer?.(e.model, asks.length)
     if (custom) return { value: custom }
     return { value: { isAnswered: true, text: e.model.includes('haiku') ? BY_HAIKU : BY_SONNET, usage } }
@@ -24,7 +26,7 @@ function engine(on: On, answer?: (model: string, calls: number) => unknown) {
     const { Markdown } = $.ui.resolve(e)
     return <Markdown text={(e.props as { text: string }).text} />
   })
-  return { asks, clock: mock.clock(on), session: mock.session(on) }
+  return { asks, efforts, clock: mock.clock(on), session: mock.session(on) }
 }
 
 function reply(uuid: string, text = ORIGINAL, agentId?: string) {
@@ -145,5 +147,16 @@ test('a short reply gets no buttons', async ($, on) => {
     props: { text: '好的。', isFirstOfReply: true },
   } as never)
   expect(await ui.find({ type: 'Button', text: '原文' })).toBeFalsy()
+  await ui.unmount()
+})
+
+test('rewrites ask for low effort and show how long they took', async ($, on) => {
+  const { clock, efforts } = engine(on)
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  const ui = await $.ui.mount(block('desktop', 'row-t'))
+  await press(ui, 'Haiku 5.5 改写')
+  await clock.settle()
+  expect(efforts).toEqual(['low'])
+  expect(await ui.find({ type: 'Text', text: /Haiku 5\.5 改写 · \d+\.\d 秒/ })).toBeTruthy()
   await ui.unmount()
 })

@@ -11,6 +11,8 @@ export type Rewrite = {
   text?: string
   /** Why it failed, once failed. */
   error?: string
+  /** How long the rewrite took, in milliseconds. */
+  ms?: number
 }
 
 /** One message, keyed by a hash of its original text. */

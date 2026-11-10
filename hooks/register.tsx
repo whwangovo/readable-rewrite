@@ -63,6 +63,8 @@ async function attempt($: EngineInterface, model: Rewriter, original: string): P
       prompt: original,
       maxTokens: Math.min(16000, Math.max(1024, original.length * 3)),
       timeoutMs: 180_000,
+      // Rewriting needs no deep thinking; low effort keeps the wait short.
+      effort: 'low',
     })
     if (r.isAnswered) {
       const text = r.text.trim()
@@ -77,10 +79,12 @@ async function attempt($: EngineInterface, model: Rewriter, original: string): P
 }
 
 async function rewrite($: EngineInterface, hash: string, model: Rewriter, original: string) {
+  const startedAt = Date.now()
   let result = await attempt($, model, original)
   if (result.isAborted) result = await attempt($, model, original)
   const { isAborted: _, ...done } = result
-  await update($, rewritesAtom, cur => setRewrite(cur, hash, model, done))
+  const ms = Date.now() - startedAt
+  await update($, rewritesAtom, cur => setRewrite(cur, hash, model, { ...done, ms }))
 }
 
 /** Starts a model's rewrite unless it is done or under way. */
@@ -221,7 +225,7 @@ export const register: Register = on => {
       <Box flexDirection="column">
         <Box flexDirection="column" borderStyle="round" borderColor={MODELS[view].color} paddingX={1}>
           <Text size="caption" color={MODELS[view].color}>
-            {MODELS[view].label} 改写
+            {MODELS[view].label} 改写{shown.ms === undefined ? '' : ` · ${(shown.ms / 1000).toFixed(1)} 秒`}
           </Text>
           {drawn}
         </Box>
