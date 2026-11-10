@@ -6,7 +6,7 @@ A Claude Code mod that adds three buttons under each assistant reply: **原文**
 - Rewrites run through your own Claude Code session (its account and credentials), one small request per press. Each model's result is cached, so switching back and forth costs nothing extra.
 - Replies shorter than 60 characters and subagent output are left alone.
 
-The rewrite rules (in Chinese, applied to Chinese and English replies alike) are in [`hooks/rubric.ts`](hooks/rubric.ts). They target constructions that psycholinguistics links to reading difficulty and that recent models overuse — inanimate subjects doing animate things, stacked nouns, ad-hoc verbs made from nouns, dropped connectives, long dependencies — following Clark, Martin & Mahowald (2026), *Why is AI-generated language so hard to understand?* (arXiv:2610.29162).
+The rewrite rules (in Chinese, applied to Chinese and English replies alike) are in [`hooks/rubric.ts`](hooks/rubric.ts). They ask the model to retell the reply in plain words rather than polish it: answer first, keep only the numbers the conclusion rests on, replace jargon and internal labels with what they mean, and walk a concrete case through when comparing options. At the sentence level they target constructions that psycholinguistics links to reading difficulty and that recent models overuse — inanimate subjects doing animate things, stacked nouns, ad-hoc verbs made from nouns, dropped connectives, long dependencies — following Clark, Martin & Mahowald (2026), *Why is AI-generated language so hard to understand?* (arXiv:2610.29162).
 
 ## Install
 
